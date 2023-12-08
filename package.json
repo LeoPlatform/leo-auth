@@ -1,6 +1,6 @@
 {
   "name": "auth",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "This is a sample BOT Description",
   "main": "index.js",
   "directories": {
@@ -26,6 +26,8 @@
         "us-west-2",
         "us-east-1"
       ],
+      "runtime": "nodejs16.x",
+      "no_env_param": true,
       "3rdParty": true,
       "excludeProfiles": true
     }
@@ -35,6 +37,6 @@
   "license": "ISC",
   "dependencies": {
     "async": "^3.0.1",
-    "leo-auth": "^2.0.2"
+    "leo-auth": "^3.0.2"
   }
 }

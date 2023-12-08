@@ -1,5 +1,5 @@
 var aws = require("aws-sdk");
-var auth = require("leo-auth");
+var auth = require("../../lib/auth");
 var dynamodb = auth.dynamodb;
 var async = require("async");
 
@@ -7,7 +7,7 @@ let AUTH_TABLE = auth.configuration.resources.LeoAuth;
 let IDENTITY_TABLE = auth.configuration.resources.LeoAuthIdentity;
 let POLICY_TABLE = auth.configuration.resources.LeoAuthPolicy;
 
-exports.handler = function (event, context, callback) {
+exports.handler = function(event, context, callback) {
   var policies = [];
   var identities = [];
   var record = event.Records[0]; //We limit to 1 event per call
@@ -23,7 +23,7 @@ exports.handler = function (event, context, callback) {
       ExpressionAttributeValues: {
         ":policy": policy.name
       }
-    }, function (err, data) {
+    }, function(err, data) {
       if (err) {
         callback(err);
       } else {
@@ -36,7 +36,7 @@ exports.handler = function (event, context, callback) {
 
         // Verify all entries have the default policies object
         Object.keys(ids).forEach(id => {
-          updates.push(function (done) {
+          updates.push(function(done) {
             console.log("ID", id)
             dynamodb.docClient.update({
               TableName: AUTH_TABLE,
@@ -54,8 +54,8 @@ exports.handler = function (event, context, callback) {
           });
         });
 
-        data.Items.forEach(function (identity) {
-          updates.push(function (done) {
+        data.Items.forEach(function(identity) {
+          updates.push(function(done) {
             console.log("Identity", identity.identity, policy.name, policy.statements)
             dynamodb.docClient.update({
               TableName: AUTH_TABLE,
@@ -82,7 +82,7 @@ exports.handler = function (event, context, callback) {
       Key: {
         identity: keys.identity
       }
-    }, function (err, data) {
+    }, function(err, data) {
       if (err) {
         callback(err);
       } else {
@@ -105,7 +105,7 @@ exports.handler = function (event, context, callback) {
             Key: {
               name: keys.policy
             }
-          }, function (err, data) {
+          }, function(err, data) {
             if (err) {
               callback(err);
             } else if (data.Item) {

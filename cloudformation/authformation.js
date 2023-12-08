@@ -1,90 +1,10 @@
-{
+module.exports = {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Mappings": {
-    "RegionMap": {
-      "us-east-1": {
-        "S3Bucket": "leo-cli-publishbucket-abb4i613j9y9"
-      },
-      "us-west-2": {
-        "S3Bucket": "leo-cli-publishbucket-mzhr7agmqo7u"
-      }
-    }
-  },
+  "Mappings": {},
   "Metadata": {},
   "Resources": {
     "RestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Description": "This is a sample BOT Description",
-        "Name": {
-          "Fn::Sub": "${AWS::StackName}-auth"
-        },
-        "Body": {
-          "swagger": "2.0",
-          "info": {
-            "version": "1.2.0",
-            "title": "auth"
-          },
-          "basePath": "/",
-          "schemes": [
-            "https"
-          ],
-          "paths": {
-            "/api/authorize": {
-              "put": {
-                "produces": [
-                  "application/json"
-                ],
-                "security": [
-                  {
-                    "sigv4": []
-                  }
-                ],
-                "responses": {
-                  "200": {
-                    "description": "200 response",
-                    "schema": {
-                      "$ref": "#/definitions/Empty"
-                    },
-                    "headers": {
-                      "Access-Control-Allow-Origin": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "x-amazon-apigateway-integration": {
-                  "responses": {
-                    "default": {
-                      "statusCode": "200"
-                    }
-                  },
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Authorize.Arn}/invocations"
-                  },
-                  "passthroughBehavior": "when_no_match",
-                  "httpMethod": "POST",
-                  "contentHandling": "CONVERT_TO_TEXT",
-                  "type": "aws_proxy"
-                }
-              }
-            }
-          },
-          "securityDefinitions": {
-            "sigv4": {
-              "type": "apiKey",
-              "name": "Authorization",
-              "in": "header",
-              "x-amazon-apigateway-authtype": "awsSigv4"
-            }
-          },
-          "definitions": {
-            "Empty": {
-              "type": "object"
-            }
-          }
-        }
-      }
+
     },
     "ApiRole": {
       "Type": "AWS::IAM::Role",
@@ -123,140 +43,11 @@
                     "lambda:AddPermission"
                   ],
                   "Resource": "*"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "lambda:InvokeFunction"
-                  ],
-                  "Resource": {
-                    "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*"
-                  }
                 }
               ]
             }
           }
         ]
-      }
-    },
-    "Authorize": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::FindInMap": [
-              "RegionMap",
-              {
-                "Ref": "AWS::Region"
-              },
-              "S3Bucket"
-            ]
-          },
-          "S3Key": "auth/release/1.2.0/Authorize_1.0.0.1702071528221.zip"
-        },
-        "Description": "This is a sample ApiGateway Description",
-        "Handler": "index.handler",
-        "Environment": {
-          "Variables": {
-            "Resources": "{}"
-          }
-        },
-        "MemorySize": 128,
-        "Runtime": "nodejs16.x",
-        "Timeout": 3,
-        "Role": {
-          "Fn::Sub": "${ApiRole.Arn}"
-        },
-        "Tags": []
-      }
-    },
-    "AuthorizeGatewayPermission": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "Authorize"
-        },
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*"
-        }
-      }
-    },
-    "LeoAuthInstall": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::FindInMap": [
-              "RegionMap",
-              {
-                "Ref": "AWS::Region"
-              },
-              "S3Bucket"
-            ]
-          },
-          "S3Key": "auth/release/1.2.0/LeoAuthInstall_1.0.0.1702071528226.zip"
-        },
-        "Description": "Installs Default policy",
-        "Handler": "index.handler",
-        "Environment": {
-          "Variables": {
-            "Resources": {
-              "Fn::Sub": "{\"Region\":\"${AWS::Region}\",\"LeoAuth\":\"${LeoAuth}\",\"LeoAuthUser\":\"${LeoAuthUser}\",\"LeoAuthPolicy\":\"${LeoAuthPolicy}\",\"LeoAuthIdentity\":\"${LeoAuthIdentity}\"}"
-            }
-          }
-        },
-        "MemorySize": 128,
-        "Runtime": "nodejs16.x",
-        "Timeout": 5,
-        "Role": {
-          "Fn::Sub": "${LeoAuthRole.Arn}"
-        },
-        "Tags": []
-      }
-    },
-    "LeoAuthWatch": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::FindInMap": [
-              "RegionMap",
-              {
-                "Ref": "AWS::Region"
-              },
-              "S3Bucket"
-            ]
-          },
-          "S3Key": "auth/release/1.2.0/LeoAuthWatch_1.0.0.1702071528229.zip"
-        },
-        "Description": "This is a sample BOT Description",
-        "Handler": "index.handler",
-        "Environment": {
-          "Variables": {
-            "Resources": {
-              "Fn::Sub": "{\"Region\":\"${AWS::Region}\",\"LeoAuth\":\"${LeoAuth}\",\"LeoAuthUser\":\"${LeoAuthUser}\",\"LeoAuthPolicy\":\"${LeoAuthPolicy}\",\"LeoAuthIdentity\":\"${LeoAuthIdentity}\"}"
-            }
-          }
-        },
-        "MemorySize": 128,
-        "Runtime": "nodejs16.x",
-        "Timeout": 3,
-        "Role": {
-          "Fn::Sub": "${LeoAuthRole.Arn}"
-        },
-        "Tags": []
-      }
-    },
-    "ApiDeployment1702071528231": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "RestApi"
-        },
-        "StageName": "Release",
-        "Description": "Version: 1.2.0"
       }
     },
     "AuthInstall": {
@@ -565,8 +356,6 @@
       }
     }
   },
-  "Parameters": {},
-  "Conditions": {},
   "Outputs": {
     "Policy": {
       "Description": "Policy for Read/Write to the Bus",
@@ -600,10 +389,7 @@
           "Fn::Sub": "${AWS::StackName}-LeoAuthUser"
         }
       }
-    },
-    "LeoTemplate": {
-      "Description": "Leo Template",
-      "Value": "/auth/release/1.2.0/cloudformation-1702071539119.json"
     }
   }
 }
+

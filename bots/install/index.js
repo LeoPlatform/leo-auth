@@ -2,7 +2,7 @@
 
 const https = require("https");
 const url = require("url");
-const auth = require("leo-auth");
+const auth = require("../../lib/auth");
 exports.handler = (event, context, callback) => {
   console.log(event);
 
@@ -21,13 +21,13 @@ exports.handler = (event, context, callback) => {
       }
     };
 
-    var request = https.request(options, function (response) {
+    var request = https.request(options, function(response) {
       console.log("Status code: " + response.statusCode);
       console.log("Status message: " + response.statusMessage);
       callback(null, result);
     });
 
-    request.on("error", function (error) {
+    request.on("error", function(error) {
       console.log("send(..) failed executing https.request(..): " + error);
       callback(error);
     });
@@ -35,7 +35,7 @@ exports.handler = (event, context, callback) => {
     request.end();
   }
 
-  process.on('uncaughtException', function (err) {
+  process.on('uncaughtException', function(err) {
     console.log("Got unhandled Exception");
     console.log(err);
     sendResponse({

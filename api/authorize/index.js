@@ -1,9 +1,9 @@
 "use strict";
-var request = require("@leo-sdk/core/auth/request.js");
+var request = require("leo-auth");
 
-exports.handler = function (event, context, callback) {
+exports.handler = function(event, context, callback) {
 
-  request.authorize(event.body.event, event.body.resource, function (err, user) {
+  request.authorize(event.body.event, event.body.resource, function(err, user) {
     if (err) {
       callback(err);
     } else {
