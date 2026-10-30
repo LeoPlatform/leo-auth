@@ -40,7 +40,7 @@
     "@aws-sdk/lib-dynamodb": "^3.1022.0",
     "@aws-sdk/util-dynamodb": "^3.996.0",
     "async": "^3.0.1",
-    "leo-auth": "4.0.8-awsv3node26.0",
+    "leo-auth": "4.0.8-awsv3node26.1",
     "leo-config": "1.1.0"
   }
 }
