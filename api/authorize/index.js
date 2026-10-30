@@ -1,17 +1,10 @@
 "use strict";
 var request = require("leo-auth");
 
-exports.handler = function(event, context, callback) {
-
-  request.authorize(event.body.event, event.body.resource, function(err, user) {
-    if (err) {
-      callback(err);
-    } else {
-      callback(null, {
-        authorized: event.body.request_id,
-        user: user
-      });
-    }
-  });
-
+exports.handler = async function(event) {
+  let user = await request.authorize(event.body.event, event.body.resource);
+  return {
+    authorized: event.body.request_id,
+    user: user
+  };
 };

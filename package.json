@@ -1,6 +1,6 @@
 {
   "name": "auth",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "This is a sample BOT Description",
   "main": "index.js",
   "directories": {
@@ -26,7 +26,7 @@
         "us-west-2",
         "us-east-1"
       ],
-      "runtime": "nodejs16.x",
+      "runtime": "nodejs26.x",
       "no_env_param": true,
       "3rdParty": true,
       "excludeProfiles": true
@@ -36,7 +36,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1022.0",
+    "@aws-sdk/lib-dynamodb": "^3.1022.0",
+    "@aws-sdk/util-dynamodb": "^3.996.0",
     "async": "^3.0.1",
-    "leo-auth": "^3.0.2"
+    "leo-auth": "4.0.8-awsv3node26.0",
+    "leo-config": "1.1.0"
   }
 }
