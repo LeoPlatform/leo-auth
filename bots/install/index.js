@@ -1,23 +1,23 @@
 "use strict";
 
 const https = require("https");
-const url = require("url");
 const auth = require("../../lib/auth");
-exports.handler = (event, context, callback) => {
+const wrapAsAsync = require("../../lib/wrap-as-async");
+exports.handler = wrapAsAsync((event, context, callback) => {
   console.log(event);
 
   function sendResponse(result) {
     console.log(result);
     var responseBody = JSON.stringify(result);
-    var parsedUrl = url.parse(event.ResponseURL);
+    var parsedUrl = new URL(event.ResponseURL);
     var options = {
       hostname: parsedUrl.hostname,
       port: 443,
-      path: parsedUrl.path,
+      path: parsedUrl.pathname + parsedUrl.search,
       method: "PUT",
       headers: {
         "content-type": "",
-        "content-length": responseBody.length
+        "content-length": Buffer.byteLength(responseBody)
       }
     };
 
@@ -84,7 +84,7 @@ exports.handler = (event, context, callback) => {
       LogicalResourceId: event.LogicalResourceId
     });
   });
-};
+});
 
 function addPolicy(policy, done) {
   return new Promise((resolve, reject) => {

@@ -1,20 +1,25 @@
-var aws = require("aws-sdk");
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 var auth = require("../../lib/auth");
 var dynamodb = auth.dynamodb;
 var async = require("async");
+var wrapAsAsync = require("../../lib/wrap-as-async");
 
 let AUTH_TABLE = auth.configuration.resources.LeoAuth;
 let IDENTITY_TABLE = auth.configuration.resources.LeoAuthIdentity;
 let POLICY_TABLE = auth.configuration.resources.LeoAuthPolicy;
 
-exports.handler = function(event, context, callback) {
+exports.handler = wrapAsAsync(function(event, context, callback) {
   var policies = [];
   var identities = [];
   var record = event.Records[0]; //We limit to 1 event per call
   console.log(record.eventSourceARN);
   if (record.eventSourceARN.match(POLICY_TABLE)) {
     console.log(record);
-    var policy = aws.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+    // A deleted policy has no NewImage and nothing to copy; failing here would block the stream shard.
+    if (!record.dynamodb.NewImage) {
+      return callback();
+    }
+    var policy = unmarshall(record.dynamodb.NewImage);
     console.log(policy);
     dynamodb.docClient.query({
       TableName: IDENTITY_TABLE,
@@ -76,7 +81,7 @@ exports.handler = function(event, context, callback) {
       }
     });
   } else {
-    var keys = aws.DynamoDB.Converter.unmarshall(record.dynamodb.Keys);
+    var keys = unmarshall(record.dynamodb.Keys);
     dynamodb.docClient.get({
       TableName: AUTH_TABLE,
       Key: {
@@ -120,7 +125,7 @@ exports.handler = function(event, context, callback) {
       }
     });
   }
-};
+});
 
 function saveIdentity(identity, callback) {
   console.log("out identity", identity);
