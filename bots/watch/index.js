@@ -15,6 +15,10 @@ exports.handler = wrapAsAsync(function(event, context, callback) {
   console.log(record.eventSourceARN);
   if (record.eventSourceARN.match(POLICY_TABLE)) {
     console.log(record);
+    // A deleted policy has no NewImage and nothing to copy; failing here would block the stream shard.
+    if (!record.dynamodb.NewImage) {
+      return callback();
+    }
     var policy = unmarshall(record.dynamodb.NewImage);
     console.log(policy);
     dynamodb.docClient.query({
